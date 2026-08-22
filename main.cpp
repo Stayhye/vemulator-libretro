@@ -48,9 +48,21 @@ static byte *romData;
 
 RETRO_API void retro_set_environment(retro_environment_t env)
 {
+   struct retro_vfs_interface_info vfs_iface_info;
+
    environment_cb = env;
 
    env(RETRO_ENVIRONMENT_SET_VARIABLES, options);
+
+   /* Take the frontend's VFS when it offers one. Every file this core touches
+      already goes through RFILE - the ROM in retro_load_game, the flash save
+      file, VMU::loadBIOS - so this hand-off is all that is needed for paths
+      stdio cannot open on its own. Android's SAF hands out content:// URIs,
+      and this core is need_fullpath, so it opens those paths itself. */
+   vfs_iface_info.required_interface_version = 1;
+   vfs_iface_info.iface                      = NULL;
+   if (env(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+      filestream_vfs_init(&vfs_iface_info);
 }
 
 RETRO_API void retro_set_video_refresh(retro_video_refresh_t vr)

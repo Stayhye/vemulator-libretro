@@ -152,6 +152,7 @@ ifeq ($(platform), ps2)
    STATIC_LINKING = 1
    OLD_GCC = 1
    FLAGS += -G0 -O3 -DSKIP_COLOR_CORRECTION
+endif
 
 LDFLAGS += $(LIBM)
 
